@@ -57,6 +57,7 @@ int main()
 {
     FILE *source = fopen("Celcius-Farenheit.txt","r");
     FILE *intermediate = fopen("CF-intermediate.txt","w");
+    FILE *symtable = fopen("CF-symtable.txt","w");
     // test for files not existing.
     if (source == NULL)
     {
@@ -112,6 +113,7 @@ int main()
                 //    printf("counter = %d %ld %ld %ld\n",symcounter,sizeof(symtab),sizeof(SYMTAB),sizeof(more_symtab));
                     strcpy(symtab[symcounter-1].LABEL,Label);
                     symtab[symcounter-1].LOCCTR=LOCCTR;
+                    fprintf(symtable,"%s\t%x\n",symtab[symcounter-1].LABEL,symtab[symcounter-1].LOCCTR);
                 }
                 else {
                     puts ("Error (re)allocating memory");
@@ -146,7 +148,7 @@ int main()
         }
         if(Label==NULL)
             Label=" ";
-        fprintf(intermediate,"%x\t%s\t%s\t%s",LOCCTR,Label,instruction,operand);
+        fprintf(intermediate,"%x\t%s\t%s\t%s",LOCCTR-2,Label,instruction,operand);
     }
     free(symtab);
     return 0;
