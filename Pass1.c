@@ -8,6 +8,14 @@ typedef struct OPTAB1{
     char *OPCODE;
 }OPTAB;
 
+typedef struct SYMTAB1{
+    char LABEL[10];
+    int LOCCTR;
+}SYMTAB;
+
+SYMTAB *symtab=NULL,*more_symtab=NULL;
+int symcounter=0;
+
 OPTAB* getoptab()
 {
     OPTAB optab[5];
@@ -24,6 +32,27 @@ OPTAB* getoptab()
     return optab;
 }
 
+int opcodefind(char *instruction){
+    //printf("instruct = %s\n",instruction);
+    OPTAB *optab;
+    optab = getoptab();
+    int i;
+    for(i=0;i<5;i++){
+        if(!strcmp(optab[i].Mnemonic,instruction))
+            return 1;
+    }
+    return 0;
+}
+
+int search(char *Label){
+    int i;
+    for(i=0;i<symcounter;i++){
+        if(!strcmp(symtab[i].LABEL,Label))
+            return 1;
+    }
+    return 0;
+}
+
 int main()
 {
     FILE *source = fopen("Celcius-Farenheit.txt","r");
@@ -35,41 +64,90 @@ int main()
         return 0;
     }
 
-    OPTAB *optab;
-    optab= getoptab();
+
 
     char *Label,*instruction,*operand,ProgramName[10];
     char *end,line[250];
     int LOCCTR,STARTLOC;
     do
     {
-        fscanf(source,"%s %s %s",Label,instruction,operand);
-        //fgets(line, sizeof(line), source);
+        //fscanf(source,"%s %s %s",Label,instruction,operand);
+        fgets(line, 250, source);
+        Label=strtok(line," ");
+        instruction=strtok(NULL," ");
+        operand=strtok(NULL," ");
     }while(strcmp(instruction,"START")!=0);
-    LOCCTR = strtol(operand,&end,10);
+    LOCCTR = strtol(operand,&end,16);
     STARTLOC = LOCCTR;
     strcpy(ProgramName,Label);
-    //fgets(line, sizeof(line), source);
-    while(1)
+
+
+    while(strcmp(instruction,"END")!=0)
     {
-        char *L,*I,*O;
-        //fgets(line, sizeof(line), source);
-        //puts(line);
-        //fscanf(source,"%[^\n]s",line);
+        char *L=NULL,*I=NULL,*O=NULL,*Error= NULL;
+        Label = NULL;instruction=NULL;operand= NULL;
+        fgets(line, 250, source);
         L=strtok(line," ");
         I=strtok(NULL," ");
         O=strtok(NULL," ");
+        //printf("ksdjkl");
         if(O==NULL){
-            strcpy(instruction,L);
-            strcpy(operand,I);
-            printf("NOL %s %s\n",instruction,operand);
+
+            instruction=L;
+            operand=I;
         }
         else{
-            strcpy(Label,L);
-            strcpy(instruction,I);
-            strcpy(operand,O);
-            printf("%s %s %s\n",Label,instruction,operand);
+            Label=L;
+            instruction=I;
+            operand=O;
+            if(search(Label)){
+                Error = "Duplicate Label";
+            }
+            else{
+                symcounter++;
+                //printf("counter = %d %ld %ld %ld\n",symcounter,sizeof(symtab),sizeof(SYMTAB),sizeof(more_symtab));
+                more_symtab = (SYMTAB*) realloc (symtab, symcounter * sizeof(SYMTAB));
+                if (more_symtab!=NULL) {
+                    symtab=more_symtab;
+                //    printf("counter = %d %ld %ld %ld\n",symcounter,sizeof(symtab),sizeof(SYMTAB),sizeof(more_symtab));
+                    strcpy(symtab[symcounter-1].LABEL,Label);
+                    symtab[symcounter-1].LOCCTR=LOCCTR;
+                }
+                else {
+                    puts ("Error (re)allocating memory");
+                    exit (1);
+                }
+                /*
+                strcpy(symtab[symcounter].LABEL,Label);
+                symtab[symcounter].LOCCTR=LOCCTR;
+                //printf("jjds %s %d",symtab[symcounter].LABEL,symtab[symcounter].LOCCTR);
+                symcounter++;
+                */
+            }
         }
+
+        if(opcodefind(instruction)){
+            LOCCTR+=2;
+        }
+        else if(!strcmp(instruction,"WORD")){
+            LOCCTR+=2;
+        }
+        else if(!strcmp(instruction,"RESW")){
+            LOCCTR+=atoi(operand)*2;
+        }
+        else if(!strcmp(instruction,"BYTE")){
+
+        }
+        else if(!strcmp(instruction,"END")){
+            LOCCTR+=2;
+        }
+        else{
+            Error = "Invalid opcode";
+        }
+        if(Label==NULL)
+            Label=" ";
+        fprintf(intermediate,"%x\t%s\t%s\t%s",LOCCTR,Label,instruction,operand);
     }
+    free(symtab);
     return 0;
 }
