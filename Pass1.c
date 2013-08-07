@@ -53,19 +53,54 @@ int search(char *Label){
     return 0;
 }
 
+int _getfile(){
+    int a;
+    printf("Choose from following input file:\n");
+    printf("case 1: Celcius-Farenheit.txt\n");
+    printf("case 2: Celcius-Farenheit_error.txt\n");
+    printf("case 3: Simple-Interest.txt\n");
+    printf("case 4: Simple-Interest_error.txt\n");
+    scanf("%d",&a);
+    do{
+        printf("invalid option\n try again\n");
+        scanf("%d",&a);
+    }while(a<1||a>4);
+    return a;
+}
+
 int main()
 {
-    FILE *source = fopen("Celcius-Farenheit.txt","r");
-    FILE *intermediate = fopen("CF-intermediate.txt","w");
-    FILE *symtable = fopen("CF-symtable.txt","w");
+    int a = _getfile();
+    FILE *source,*intermediate,*symtable;
+    switch(a){
+    case 1:
+        source = fopen("Celcius-Farenheit.txt","r");
+        intermediate = fopen("CF-intermediate.txt","w");
+        symtable = fopen("CF-symtable.txt","w");
+        break;
+    case 2:
+        source = fopen("Celcius-Farenheit_error.txt","r");
+        intermediate = fopen("CF_error-intermediate.txt","w");
+        symtable = fopen("CF_error-symtable.txt","w");
+        break;
+    case 3:
+        source = fopen("Simple-Interest.txt","r");
+        intermediate = fopen("SI-intermediate.txt","w");
+        symtable = fopen("SI-symtable.txt","w");
+        break;
+    case 4:
+        source = fopen("Simple-Interest_error.txt","r");
+        intermediate = fopen("SI_error-intermediate.txt","w");
+        symtable = fopen("SI_error-symtable.txt","w");
+        break;
+    }
+
     // test for files not existing.
     if (source == NULL)
     {
         printf("Error! Could not open file\n");
         return 0;
     }
-
-
 
     char *Label,*instruction,*operand,ProgramName[10];
     char *end,line[250];
