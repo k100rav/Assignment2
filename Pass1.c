@@ -77,6 +77,9 @@ int main()
         Label=strtok(line," ");
         instruction=strtok(NULL," ");
         operand=strtok(NULL," ");
+        if(strcmp(instruction,"START")==0){
+            fprintf(intermediate,"%x\t%s\t%s\t%s",strtol(operand,&end,16),Label,instruction,operand);
+        }
     }while(strcmp(instruction,"START")!=0);
     LOCCTR = strtol(operand,&end,16);
     STARTLOC = LOCCTR;
