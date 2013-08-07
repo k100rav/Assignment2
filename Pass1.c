@@ -74,11 +74,11 @@ int main()
     {
         //fscanf(source,"%s %s %s",Label,instruction,operand);
         fgets(line, 250, source);
-        Label=strtok(line," ");
-        instruction=strtok(NULL," ");
-        operand=strtok(NULL," ");
+        Label=strtok(line," \t\n");
+        instruction=strtok(NULL," \t\n");
+        operand=strtok(NULL," \t\n");
         if(strcmp(instruction,"START")==0){
-            fprintf(intermediate,"%x\t%s\t%s\t%s",strtol(operand,&end,16),Label,instruction,operand);
+            fprintf(intermediate,"%x\t%s\t%s\t%s\n",strtol(operand,&end,16),Label,instruction,operand);
         }
     }while(strcmp(instruction,"START")!=0);
     LOCCTR = strtol(operand,&end,16);
@@ -89,11 +89,12 @@ int main()
     while(strcmp(instruction,"END")!=0)
     {
         char *L=NULL,*I=NULL,*O=NULL,*Error= NULL;
+        Error =NULL;
         Label = NULL;instruction=NULL;operand= NULL;
         fgets(line, 250, source);
-        L=strtok(line," ");
-        I=strtok(NULL," ");
-        O=strtok(NULL," ");
+        L=strtok(line," \t\n");
+        I=strtok(NULL," \t\n");
+        O=strtok(NULL," \t\n");
         //printf("ksdjkl");
         if(O==NULL){
 
@@ -132,10 +133,10 @@ int main()
         }
 
         if(opcodefind(instruction)){
-            LOCCTR+=2;
+            LOCCTR+=3;
         }
         else if(!strcmp(instruction,"WORD")){
-            LOCCTR+=2;
+            LOCCTR+=3;
         }
         else if(!strcmp(instruction,"RESW")){
             LOCCTR+=atoi(operand)*2;
@@ -144,14 +145,17 @@ int main()
 
         }
         else if(!strcmp(instruction,"END")){
-            LOCCTR+=2;
+            LOCCTR+=3;
         }
         else{
             Error = "Invalid opcode";
+            LOCCTR+=3;
         }
         if(Label==NULL)
             Label=" ";
-        fprintf(intermediate,"%x\t%s\t%s\t%s",LOCCTR-2,Label,instruction,operand);
+        if(Error==NULL)
+            Error=" ";
+        fprintf(intermediate,"%x\t%s\t%s\t%s\t%s\n",LOCCTR-3,Label,instruction,operand,Error);
     }
     free(symtab);
     return 0;
