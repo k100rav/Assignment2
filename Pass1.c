@@ -61,10 +61,10 @@ int _getfile(){
     printf("case 3: Simple-Interest.txt\n");
     printf("case 4: Simple-Interest_error.txt\n");
     scanf("%d",&a);
-    do{
+    while(a<1||a>4){
         printf("invalid option\n try again\n");
         scanf("%d",&a);
-    }while(a<1||a>4);
+    }
     return a;
 }
 
@@ -105,6 +105,8 @@ int main()
     char *Label,*instruction,*operand,ProgramName[10];
     char *end,line[250];
     int LOCCTR,STARTLOC;
+
+    //This loop read input line from source code and loop end when it encounter 'START' keyword
     do
     {
         //fscanf(source,"%s %s %s",Label,instruction,operand);
@@ -116,11 +118,18 @@ int main()
             fprintf(intermediate,"%x\t%s\t%s\t%s\n",strtol(operand,&end,16),Label,instruction,operand);
         }
     }while(strcmp(instruction,"START")!=0);
+
+    //Iniatisation of Location counter
     LOCCTR = strtol(operand,&end,16);
     STARTLOC = LOCCTR;
     strcpy(ProgramName,Label);
 
 
+    //This while loop read the source code line by line, ends when END keyword in instruction column appear for first time
+    //In each loop iteration it will first Label is present or not
+    //then it find instruction(opcode) and operand
+    //according to opcode found it increase location counter(LOCCTR) by 3 byte(memory add 2 byte + opcode 1 byte)
+    //Then at last it print symtable in symtable.txt file and location instruction and error(if any) in intermediate.txt
     while(strcmp(instruction,"END")!=0)
     {
         char *L=NULL,*I=NULL,*O=NULL,*Error= NULL;
@@ -140,6 +149,7 @@ int main()
             Label=L;
             instruction=I;
             operand=O;
+            //Check if Label already exist from symtable
             if(search(Label)){
                 Error = "Duplicate Label";
             }
@@ -190,7 +200,10 @@ int main()
             Label=" ";
         if(Error==NULL)
             Error=" ";
-        fprintf(intermediate,"%x\t%s\t%s\t%s\t%s\n",LOCCTR-3,Label,instruction,operand,Error);
+        if(!strcmp(instruction,"END"))
+            fprintf(intermediate,"%s\t%s\t%s\t%s\n",Label,instruction,operand,Error);
+        else
+            fprintf(intermediate,"%x\t%s\t%s\t%s\t%s\n",LOCCTR-3,Label,instruction,operand,Error);
     }
     free(symtab);
     return 0;
