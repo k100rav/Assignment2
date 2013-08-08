@@ -187,7 +187,7 @@ int main()
             LOCCTR+=atoi(operand)*2;
         }
         else if(!strcmp(instruction,"BYTE")){
-
+            LOCCTR+=1;
         }
         else if(!strcmp(instruction,"END")){
             LOCCTR+=3;
@@ -200,10 +200,7 @@ int main()
             Label=" ";
         if(Error==NULL)
             Error=" ";
-        if(!strcmp(instruction,"END"))
-            fprintf(intermediate,"%s\t%s\t%s\t%s\n",Label,instruction,operand,Error);
-        else
-            fprintf(intermediate,"%x\t%s\t%s\t%s\t%s\n",LOCCTR-3,Label,instruction,operand,Error);
+        fprintf(intermediate,"%x\t%s\t%s\t%s\t%s\n",LOCCTR-3,Label,instruction,operand,Error);
     }
     free(symtab);
     return 0;
